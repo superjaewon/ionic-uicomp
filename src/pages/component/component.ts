@@ -1,8 +1,12 @@
 import { Component } from '@angular/core';
-import {ActionSheetController, IonicPage, ModalController, NavController, NavParams, Platform} from 'ionic-angular';
+import {
+  ActionSheetController, AlertController, IonicPage, ModalController, NavController, NavParams,
+  Platform, ToastController
+} from 'ionic-angular';
 import {ModalPage} from "../modal/modal";
 import {SlidePage} from "../slide/slide";
-
+import {AccountInterface} from "../../interfaces/account";
+import {NavPage} from "../nav/nav"; //인터페이스 추가
 /**
  * Generated class for the ComponentPage page.
  *
@@ -16,8 +20,14 @@ import {SlidePage} from "../slide/slide";
   templateUrl: 'component.html',
 })
 export class ComponentPage {
-
-  constructor(public navCtrl: NavController, public actionsheetCtrl: ActionSheetController, public platform:Platform, public modaCtrl:ModalController, public navParams: NavParams) {
+  private accountData = {} as AccountInterface; //선언
+  constructor(public navCtrl: NavController,
+              public actionsheetCtrl: ActionSheetController,
+              public platform:Platform,
+              public modaCtrl:ModalController,
+              public navParams: NavParams,
+              public alertCtrl:AlertController,
+              public toastCtrl:ToastController,) {
   }
 
   ionViewDidLoad() {
@@ -82,4 +92,37 @@ export class ComponentPage {
  slide(){
     this.navCtrl.push('SlidePage');
  }
+
+ promptAlert(){
+   let prompt = this.alertCtrl.create({
+     title: 'Login',
+     message: "이름과E-Mail를입력하세요",
+     inputs: [
+       { name: 'name', placeholder: 'Name 입력' },
+       { name: 'email', placeholder: 'Email 입력' },
+     ],
+     buttons: [
+       { text: '취소', handler: data => { console.log('Cancel clicked'); } },
+       {text: '저장',handler: data => {
+         this.accountData= { name : data.name, email : data.email}
+         this.navCtrl.push('NavPage',{account:this.accountData});}}
+       ]}
+       );
+
+   prompt.present();
+   console.log(this.accountData);
+
+  }
+  toast(){
+    let toast = this.toastCtrl.create({
+      message:'3초동안 보였다가 사라집니다.',
+      duration:3000,
+      position:'top',
+      showCloseButton: true,
+      closeButtonText: 'Ok',
+    });
+    toast.onDidDismiss((data) => console.log("toast사라짐"+data));
+
+    toast.present();
+  }
 }
